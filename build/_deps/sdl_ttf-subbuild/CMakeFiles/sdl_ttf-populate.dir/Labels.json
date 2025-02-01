@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/kirik/Code/Clay/cround/build/_deps/sdl_ttf-subbuild/CMakeFiles/sdl_ttf-populate"
+		},
+		{
+			"file" : "/home/kirik/Code/Clay/cround/build/_deps/sdl_ttf-subbuild/CMakeFiles/sdl_ttf-populate.rule"
+		},
+		{
+			"file" : "/home/kirik/Code/Clay/cround/build/_deps/sdl_ttf-subbuild/CMakeFiles/sdl_ttf-populate-complete.rule"
+		},
+		{
+			"file" : "/home/kirik/Code/Clay/cround/build/_deps/sdl_ttf-subbuild/sdl_ttf-populate-prefix/src/sdl_ttf-populate-stamp/sdl_ttf-populate-build.rule"
+		},
+		{
+			"file" : "/home/kirik/Code/Clay/cround/build/_deps/sdl_ttf-subbuild/sdl_ttf-populate-prefix/src/sdl_ttf-populate-stamp/sdl_ttf-populate-configure.rule"
+		},
+		{
+			"file" : "/home/kirik/Code/Clay/cround/build/_deps/sdl_ttf-subbuild/sdl_ttf-populate-prefix/src/sdl_ttf-populate-stamp/sdl_ttf-populate-download.rule"
+		},
+		{
+			"file" : "/home/kirik/Code/Clay/cround/build/_deps/sdl_ttf-subbuild/sdl_ttf-populate-prefix/src/sdl_ttf-populate-stamp/sdl_ttf-populate-install.rule"
+		},
+		{
+			"file" : "/home/kirik/Code/Clay/cround/build/_deps/sdl_ttf-subbuild/sdl_ttf-populate-prefix/src/sdl_ttf-populate-stamp/sdl_ttf-populate-mkdir.rule"
+		},
+		{
+			"file" : "/home/kirik/Code/Clay/cround/build/_deps/sdl_ttf-subbuild/sdl_ttf-populate-prefix/src/sdl_ttf-populate-stamp/sdl_ttf-populate-patch.rule"
+		},
+		{
+			"file" : "/home/kirik/Code/Clay/cround/build/_deps/sdl_ttf-subbuild/sdl_ttf-populate-prefix/src/sdl_ttf-populate-stamp/sdl_ttf-populate-test.rule"
+		},
+		{
+			"file" : "/home/kirik/Code/Clay/cround/build/_deps/sdl_ttf-subbuild/sdl_ttf-populate-prefix/src/sdl_ttf-populate-stamp/sdl_ttf-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"sdl_ttf-populate"
+		],
+		"name" : "sdl_ttf-populate"
+	}
+}

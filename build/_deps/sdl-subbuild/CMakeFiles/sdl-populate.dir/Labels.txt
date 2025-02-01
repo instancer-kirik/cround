@@ -1,0 +1,14 @@
+# Target labels
+ sdl-populate
+# Source files and their labels
+/home/kirik/Code/Clay/cround/build/_deps/sdl-subbuild/CMakeFiles/sdl-populate
+/home/kirik/Code/Clay/cround/build/_deps/sdl-subbuild/CMakeFiles/sdl-populate.rule
+/home/kirik/Code/Clay/cround/build/_deps/sdl-subbuild/CMakeFiles/sdl-populate-complete.rule
+/home/kirik/Code/Clay/cround/build/_deps/sdl-subbuild/sdl-populate-prefix/src/sdl-populate-stamp/sdl-populate-build.rule
+/home/kirik/Code/Clay/cround/build/_deps/sdl-subbuild/sdl-populate-prefix/src/sdl-populate-stamp/sdl-populate-configure.rule
+/home/kirik/Code/Clay/cround/build/_deps/sdl-subbuild/sdl-populate-prefix/src/sdl-populate-stamp/sdl-populate-download.rule
+/home/kirik/Code/Clay/cround/build/_deps/sdl-subbuild/sdl-populate-prefix/src/sdl-populate-stamp/sdl-populate-install.rule
+/home/kirik/Code/Clay/cround/build/_deps/sdl-subbuild/sdl-populate-prefix/src/sdl-populate-stamp/sdl-populate-mkdir.rule
+/home/kirik/Code/Clay/cround/build/_deps/sdl-subbuild/sdl-populate-prefix/src/sdl-populate-stamp/sdl-populate-patch.rule
+/home/kirik/Code/Clay/cround/build/_deps/sdl-subbuild/sdl-populate-prefix/src/sdl-populate-stamp/sdl-populate-test.rule
+/home/kirik/Code/Clay/cround/build/_deps/sdl-subbuild/sdl-populate-prefix/src/sdl-populate-stamp/sdl-populate-update.rule

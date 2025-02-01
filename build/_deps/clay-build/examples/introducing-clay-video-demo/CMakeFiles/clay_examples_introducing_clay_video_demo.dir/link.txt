@@ -1,0 +1,1 @@
+/usr/bin/cc -Wl,--dependency-file=CMakeFiles/clay_examples_introducing_clay_video_demo.dir/link.d CMakeFiles/clay_examples_introducing_clay_video_demo.dir/main.c.o -o clay_examples_introducing_clay_video_demo  ../../../raylib-build/raylib/libraylib.a -lm -lpthread /usr/lib/libOpenGL.so /usr/lib/libGLX.so /usr/lib/libGLU.so /usr/lib/librt.a -lm -ldl

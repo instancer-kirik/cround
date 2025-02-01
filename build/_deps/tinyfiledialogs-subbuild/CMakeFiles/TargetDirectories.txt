@@ -1,0 +1,3 @@
+/home/kirik/Code/Clay/cround/build/_deps/tinyfiledialogs-subbuild/CMakeFiles/tinyfiledialogs-populate.dir
+/home/kirik/Code/Clay/cround/build/_deps/tinyfiledialogs-subbuild/CMakeFiles/edit_cache.dir
+/home/kirik/Code/Clay/cround/build/_deps/tinyfiledialogs-subbuild/CMakeFiles/rebuild_cache.dir

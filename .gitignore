@@ -5,3 +5,5 @@ build/
 *.dll
 *.so
 *.dylib 
+build
+/build/

@@ -1,1 +1,0 @@
-/usr/bin/cc -Wl,--dependency-file=CMakeFiles/clay_official_website.dir/link.d CMakeFiles/clay_official_website.dir/main.c.o -o clay_official_website

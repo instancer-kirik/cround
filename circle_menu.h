@@ -25,9 +25,11 @@ double circle_menu_get_x(CircleMenuPtr menu, size_t index);
 double circle_menu_get_y(CircleMenuPtr menu, size_t index);
 double circle_menu_get_radius(CircleMenuPtr menu, size_t index);
 int circle_menu_is_selected(CircleMenuPtr menu, size_t index);
+const char* circle_menu_get_bead_id(CircleMenuPtr menu, size_t index);
 
 // Add to C interface
 void circle_menu_update_position(CircleMenuPtr menu, size_t index, double x, double y);
+void circle_menu_update_bead(CircleMenuPtr menu, size_t index, const char* label, const char* bead_id);
 
 #ifdef __cplusplus
 }

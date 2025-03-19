@@ -1,1 +1,0 @@
-/usr/bin/cc -pthread -Wl,--dependency-file=CMakeFiles/clay_examples_sdl3_simple_demo.dir/link.d CMakeFiles/clay_examples_sdl3_simple_demo.dir/main.c.o -o clay_examples_sdl3_simple_demo  ../../../sdl-build/libSDL3.a ../../../sdl_ttf-build/libSDL3_ttf.a -lm /usr/lib/libharfbuzz.so /usr/lib/libfreetype.so

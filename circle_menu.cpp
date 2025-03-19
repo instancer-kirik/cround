@@ -62,6 +62,23 @@ void circle_menu_update_position(CircleMenuPtr menu, size_t index, double x, dou
     menu->impl.updatePosition(index, x, y);
 }
 
+void circle_menu_update_bead(CircleMenuPtr menu, size_t index, const char* label, const char* bead_id) {
+    CircleItem* circle = menu->impl.getCircle(index);
+    if (circle) {
+        if (label) {
+            circle->label = label;
+        }
+        if (bead_id) {
+            circle->bead_id = bead_id;
+        }
+    }
+}
+
+const char* circle_menu_get_bead_id(CircleMenuPtr menu, size_t index) {
+    const CircleItem* circle = menu->impl.getCircle(index);
+    return circle ? circle->bead_id.c_str() : NULL;
+}
+
 CircleMenu::CircleMenu() {}
 
 void CircleMenu::addCircle(double x, double y, double radius, const std::string& label) {
@@ -119,6 +136,13 @@ const std::vector<CircleItem>& CircleMenu::getCircles() const {
 }
 
 const CircleItem* CircleMenu::getCircle(size_t index) const {
+    if (index < circles.size()) {
+        return &circles[index];
+    }
+    return nullptr;
+}
+
+CircleItem* CircleMenu::getCircle(size_t index) {
     if (index < circles.size()) {
         return &circles[index];
     }

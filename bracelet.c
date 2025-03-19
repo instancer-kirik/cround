@@ -6,36 +6,21 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>  // Add this for memcpy and memmove
 #include "circle_menu.h"
-
+#include "bead.h"
 // External declarations
 extern BeadImage bead_images[];
 extern int num_bead_images;
 
-typedef struct {
-    Clay_Vector2 position;
-    Clay_Color color;
-    uint32_t image_id;  // 0 means no image
-    char* bead_id;      // Unique identifier for the bead type
-} BraceletBead;
-
-typedef struct {
-    float radius_px;        // Bracelet radius in pixels
-    float bead_radius_px;   // Bead radius in pixels
-    uint32_t num_slots;
-    BraceletBead* beads;
-    int32_t hovered_index;
-    BraceletConfig config;  // Store current configuration
-    CircleMenuPtr menu;  // Change from CircleMenu* to CircleMenuPtr
-    bool circle_menu_visible;
-} BraceletState;
-
-static BraceletState bracelet_state = {
+// Initialize the bracelet state
+BraceletState bracelet_state = {
     .radius_px = 0.0f,
     .bead_radius_px = 0.0f,
     .num_slots = 0,
     .beads = NULL,
     .hovered_index = -1,
+    .selected_circle_index = -1,  // Initialize to no selection
     .config = {
         .bead_size_mm = 8.0f,         // Default 8mm beads
         .bead_count = 24,             // Default 24 beads
@@ -114,8 +99,8 @@ int32_t find_hovered_bead(Clay_Vector2 pointer_pos) {
     float center_x = GetScreenWidth() / 2;  // Fix: Use same center as render
     float center_y = GetScreenHeight() / 2;
 
-    printf("Finding hover - Mouse at (%f, %f), Bracelet center at (%f, %f)\n", 
-           pointer_pos.x, pointer_pos.y, center_x, center_y);
+    //printf("Finding hover - Mouse at (%f, %f), Bracelet center at (%f, %f)\n", 
+    //       pointer_pos.x, pointer_pos.y, center_x, center_y);
 
     for (uint32_t i = 0; i < bracelet_state.num_slots; i++) {
         // Calculate bead position
@@ -141,6 +126,7 @@ void update_hovered_bead(Clay_Vector2 pointer_pos) {
 }
 
 void place_bead(int32_t slot_index, Clay_Color color, uint32_t image_id, const char* bead_id) {
+    push_undo_state();  // Add this at the start
     printf("Placing bead - slot: %d, image_id: %d, bead_id: %s\n", slot_index, image_id, bead_id);
     
     if (slot_index >= 0 && slot_index < bracelet_state.num_slots) {
@@ -171,9 +157,13 @@ void get_selected_indices(int32_t hover_index, int32_t* out_indices, int* out_co
             break;
             
         case PATTERN_ALTERNATE:
-            // Just show the group at hover point
-            for (int i = 0; i < selection.group_size && *out_count < bracelet_state.num_slots; i++) {
-                out_indices[(*out_count)++] = (hover_index + i) % bracelet_state.num_slots;
+            // Show full alternating pattern preview
+            int total_pattern = selection.group_size + selection.skip_size;
+            for (int pos = hover_index; pos < hover_index + bracelet_state.num_slots; pos += total_pattern) {
+                // Add the group at this position
+                for (int i = 0; i < selection.group_size && *out_count < bracelet_state.num_slots; i++) {
+                    out_indices[(*out_count)++] = (pos + i) % bracelet_state.num_slots;
+                }
             }
             break;
             
@@ -185,7 +175,7 @@ void get_selected_indices(int32_t hover_index, int32_t* out_indices, int* out_co
     }
 }
 
-void render_bracelet(void) {
+void render_bracelet(BeadCollection* beads) {
     float center_x = GetScreenWidth() / 2;
     float center_y = GetScreenHeight() / 2;
 
@@ -256,7 +246,6 @@ void render_bracelet(void) {
         
         DrawRectangle(panel_x, panel_y, panel_width, panel_height, 
                      (Color){240, 240, 240, 255});
-        
         DrawRectangleLines(panel_x, panel_y, panel_width, panel_height, 
                           (Color){180, 180, 180, 255});
         
@@ -278,16 +267,32 @@ void render_bracelet(void) {
             // Update circle position in the menu
             circle_menu_update_position(bracelet_state.menu, i, x + circle_size/2, y + circle_size/2);
             
-            // Draw circle
-            if (circle_menu_is_selected(bracelet_state.menu, i)) {
-                DrawCircleLines(x + circle_size/2, y + circle_size/2, circle_size/2, BLUE);
-                DrawCircleLines(x + circle_size/2, y + circle_size/2, circle_size/2 + 2, SKYBLUE);
+            // Draw bead image if available
+            const char* bead_id = circle_menu_get_bead_id(bracelet_state.menu, i);
+            if (bead_id) {
+                BeadDefinition* bead = find_bead_by_id(beads, bead_id);
+                if (bead && bead->image_id > 0) {
+                    BeadImage* img = &bead_images[bead->image_id - 1];
+                    float scale = (float)circle_size / img->texture.width;
+                    DrawTextureEx(
+                        img->texture,
+                        (Vector2){x, y},
+                        0.0f,
+                        scale,
+                        WHITE
+                    );
+                }
             } else {
+                // Draw placeholder circle
                 DrawCircle(x + circle_size/2, y + circle_size/2, circle_size/2, 
                           (Color){200, 200, 200, 255});
             }
             
-            DrawCircleLines(x + circle_size/2, y + circle_size/2, circle_size/2, RED);
+            // Draw selection highlight if needed
+            if (circle_menu_is_selected(bracelet_state.menu, i)) {
+                DrawCircleLines(x + circle_size/2, y + circle_size/2, circle_size/2, BLUE);
+                DrawCircleLines(x + circle_size/2, y + circle_size/2, circle_size/2 + 2, SKYBLUE);
+            }
         }
     }
 
@@ -338,4 +343,166 @@ void bracelet_toggle_circle_menu(void) {
 
 bool is_circle_menu_visible(void) {
     return bracelet_state.circle_menu_visible;
+}
+
+// Add knot rendering function
+void render_knot(float center_x, float center_y, float radius) {
+    if (!bracelet_state.config.has_knot) return;
+    
+    float knot_width = bracelet_state.config.knot_width_mm * MM_TO_PIXELS;
+    float knot_height = bracelet_state.config.knot_height_mm * MM_TO_PIXELS;
+    
+    // Draw square knot pattern
+    float x = center_x - knot_width/2;
+    float y = center_y + radius * 0.8f - knot_height/2;
+    
+    // Draw base rectangle
+    DrawRectangle(x, y, knot_width, knot_height, (Color){150, 120, 90, 255});
+    
+    // Draw square knot pattern
+    Color cord_color = (Color){120, 90, 60, 255};
+    float cord_width = knot_width / 8;
+    
+    // Draw diagonal cords
+    for (int i = 0; i < 4; i++) {
+        float start_x = x + i * (knot_width/4);
+        float end_x = start_x + knot_width/4;
+        DrawLineEx(
+            (Vector2){start_x, y},
+            (Vector2){end_x, y + knot_height},
+            cord_width,
+            cord_color
+        );
+        DrawLineEx(
+            (Vector2){start_x + knot_width/4, y},
+            (Vector2){start_x, y + knot_height},
+            cord_width,
+            cord_color
+        );
+    }
+    
+    // Draw cord ends if enabled
+    if (bracelet_state.config.has_cord_ends) {
+        float cord_end_size = bracelet_state.bead_radius_px * 1.2f;
+        DrawCircle(
+            x - cord_end_size,
+            y + knot_height/2,
+            cord_end_size,
+            (Color){180, 180, 180, 255}
+        );
+        DrawCircle(
+            x + knot_width + cord_end_size,
+            y + knot_height/2,
+            cord_end_size,
+            (Color){180, 180, 180, 255}
+        );
+    }
+    
+    // Draw cords coming out of knot
+    float cord_length = radius * 0.2f;
+    DrawLineEx(
+        (Vector2){x, y + knot_height/2},
+        (Vector2){x - cord_length, y + knot_height/2},
+        cord_width,
+        cord_color
+    );
+    DrawLineEx(
+        (Vector2){x + knot_width, y + knot_height/2},
+        (Vector2){x + knot_width + cord_length, y + knot_height/2},
+        cord_width,
+        cord_color
+    );
+}
+
+bool save_bracelet_to_file(const char* filename) {
+    FILE* f = fopen(filename, "w");
+    if (!f) return false;
+    
+    fprintf(f, "{\n");
+    fprintf(f, "  \"bead_count\": %d,\n", bracelet_state.config.bead_count);
+    fprintf(f, "  \"has_knot\": %s,\n", bracelet_state.config.has_knot ? "true" : "false");
+    fprintf(f, "  \"has_cord_ends\": %s,\n", bracelet_state.config.has_cord_ends ? "true" : "false");
+    
+    // Save beads
+    fprintf(f, "  \"beads\": [\n");
+    for (uint32_t i = 0; i < bracelet_state.num_slots; i++) {
+        fprintf(f, "    {\n");
+        fprintf(f, "      \"bead_id\": \"%s\",\n", 
+               bracelet_state.beads[i].bead_id ? bracelet_state.beads[i].bead_id : "");
+        fprintf(f, "      \"image_id\": %d\n", bracelet_state.beads[i].image_id);
+        fprintf(f, "    }%s\n", i < bracelet_state.num_slots - 1 ? "," : "");
+    }
+    fprintf(f, "  ]\n");
+    fprintf(f, "}\n");
+    
+    fclose(f);
+    return true;
+}
+
+bool load_bracelet_from_file(const char* filename) {
+    // TODO: Implement JSON parsing
+    // For now, just a placeholder that resets to defaults
+    BraceletConfig config = get_bracelet_config();
+    config.bead_count = 24;
+    config.has_knot = true;
+    config.has_cord_ends = false;
+    update_bracelet_config(config);
+    return true;
+}
+
+// Add undo/redo implementation
+void push_undo_state(void) {
+    if (!bracelet_state.undo.states) {
+        bracelet_state.undo.states = malloc(MAX_UNDO_STATES * sizeof(BraceletState_UndoEntry));
+        bracelet_state.undo.current = -1;
+        bracelet_state.undo.count = 0;
+    }
+
+    // Remove any redo states
+    bracelet_state.undo.count = bracelet_state.undo.current + 1;
+
+    // Shift states if we're at max capacity
+    if (bracelet_state.undo.count >= MAX_UNDO_STATES) {
+        memmove(&bracelet_state.undo.states[0], 
+                &bracelet_state.undo.states[1], 
+                (MAX_UNDO_STATES - 1) * sizeof(BraceletState_UndoEntry));
+        bracelet_state.undo.count--;
+        bracelet_state.undo.current--;
+    }
+
+    // Create new state
+    BraceletState_UndoEntry* new_state = &bracelet_state.undo.states[bracelet_state.undo.count];
+    new_state->beads = malloc(bracelet_state.num_slots * sizeof(BraceletBead));
+    new_state->num_slots = bracelet_state.num_slots;
+    new_state->timestamp = time(NULL);
+
+    // Copy current state
+    memcpy(new_state->beads, bracelet_state.beads, 
+           bracelet_state.num_slots * sizeof(BraceletBead));
+
+    bracelet_state.undo.current++;
+    bracelet_state.undo.count++;
+    bracelet_state.last_change = new_state->timestamp;
+}
+
+void undo_action(void) {
+    if (bracelet_state.undo.current <= 0) return;
+
+    bracelet_state.undo.current--;
+    BraceletState_UndoEntry* state = &bracelet_state.undo.states[bracelet_state.undo.current];
+    
+    // Restore state
+    memcpy(bracelet_state.beads, state->beads,
+           state->num_slots * sizeof(BraceletBead));
+}
+
+void redo_action(void) {
+    if (bracelet_state.undo.current >= bracelet_state.undo.count - 1) return;
+
+    bracelet_state.undo.current++;
+    BraceletState_UndoEntry* state = &bracelet_state.undo.states[bracelet_state.undo.current];
+    
+    // Restore state
+    memcpy(bracelet_state.beads, state->beads,
+           state->num_slots * sizeof(BraceletBead));
 } 

@@ -13,6 +13,7 @@ struct CircleItem {
     bool isSelected;
     std::string imagePath;
     bool hasImage;
+    std::string bead_id;
 
     CircleItem(double x = 0, double y = 0, double radius = 1.0, 
                const std::string& label = "") 
@@ -32,6 +33,7 @@ public:
     size_t getCircleCount() const;
     const std::vector<CircleItem>& getCircles() const;
     const CircleItem* getCircle(size_t index) const;
+    CircleItem* getCircle(size_t index);
     void updatePosition(size_t index, double x, double y);
 
 private:

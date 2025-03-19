@@ -11,6 +11,7 @@ static struct {
     char* username;
     char* password;
     CURL* curl;
+    BeadCollection* local_beads;  // Store beads locally for now
 } surreal_state = {0};
 
 // Helper struct for curl response
@@ -50,11 +51,60 @@ bool surreal_init(SurrealConfig config) {
 }
 
 bool surreal_save_bead(BeadDefinition* bead) {
-    if (!surreal_state.curl) return false;
+    // Initialize local collection if needed
+    if (!surreal_state.local_beads) {
+        printf("Creating new local bead collection\n");
+        surreal_state.local_beads = create_bead_collection();
+        if (!surreal_state.local_beads) {
+            printf("Error: Failed to create bead collection\n");
+            return false;
+        }
+    }
     
-    // For now, just print the bead info
-    printf("Saving bead: %s (%s)\n", bead->name, bead->category);
-    return true;  // Temporary mock implementation
+    // Generate ID if needed
+    if (!bead->id) {
+        static int next_id = 1;
+        char id_buffer[32];
+        snprintf(id_buffer, sizeof(id_buffer), "bead_%d", next_id++);
+        bead->id = strdup(id_buffer);
+        printf("Generated new bead ID: %s\n", bead->id);
+    }
+    
+    // Create deep copy of bead
+    BeadDefinition bead_copy;
+    memset(&bead_copy, 0, sizeof(BeadDefinition));  // Initialize to zero
+    
+    bead_copy.id = strdup(bead->id);
+    bead_copy.name = strdup(bead->name);
+    bead_copy.description = bead->description ? strdup(bead->description) : NULL;
+    bead_copy.category = bead->category ? strdup(bead->category) : strdup("Default");
+    bead_copy.material = bead->material;
+    bead_copy.shape = bead->shape;
+    bead_copy.finish = bead->finish;
+    bead_copy.color = bead->color;
+    bead_copy.image_id = bead->image_id;
+    bead_copy.size_mm = bead->size_mm;
+    bead_copy.is_premium = bead->is_premium;
+    
+    printf("Saving bead to local collection:\n");
+    printf("  - ID: %s\n", bead_copy.id);
+    printf("  - Name: %s\n", bead_copy.name);
+    printf("  - Image ID: %d\n", bead_copy.image_id);
+    printf("  - Category: %s\n", bead_copy.category);
+    
+    if (!add_bead_definition(surreal_state.local_beads, bead_copy)) {
+        // Clean up on failure
+        free((void*)bead_copy.id);
+        free((void*)bead_copy.name);
+        free((void*)bead_copy.description);
+        free((void*)bead_copy.category);
+        printf("Error: Failed to add bead to collection!\n");
+        return false;
+    }
+    
+    printf("Successfully added bead to collection. Total beads: %d\n", 
+           surreal_state.local_beads->count);
+    return true;
 }
 
 BeadDefinition* surreal_get_bead(const char* bead_id) {
@@ -63,14 +113,12 @@ BeadDefinition* surreal_get_bead(const char* bead_id) {
 }
 
 BeadCollection* surreal_get_all_beads(void) {
-    if (!surreal_state.curl) return NULL;
-    
-    // For now, return an empty collection
-    BeadCollection* collection = malloc(sizeof(BeadCollection));
-    collection->count = 0;
-    collection->capacity = 10;
-    collection->definitions = malloc(collection->capacity * sizeof(BeadDefinition));
-    return collection;  // Temporary mock implementation
+    // Remove the curl check here too
+    // if (!surreal_state.curl) return NULL;
+    if (!surreal_state.local_beads) {
+        surreal_state.local_beads = create_bead_collection();
+    }
+    return surreal_state.local_beads;
 }
 
 bool surreal_delete_bead(const char* bead_id) {

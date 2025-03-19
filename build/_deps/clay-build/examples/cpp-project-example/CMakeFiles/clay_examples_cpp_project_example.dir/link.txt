@@ -1,1 +1,0 @@
-/usr/bin/c++  -fsanitize=address -fno-omit-frame-pointer -g -Wl,--dependency-file=CMakeFiles/clay_examples_cpp_project_example.dir/link.d CMakeFiles/clay_examples_cpp_project_example.dir/main.cpp.o -o clay_examples_cpp_project_example

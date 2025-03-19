@@ -1,3 +1,0 @@
-/home/kirik/Code/Clay/cround/build/_deps/raygui-subbuild/CMakeFiles/raygui-populate.dir
-/home/kirik/Code/Clay/cround/build/_deps/raygui-subbuild/CMakeFiles/edit_cache.dir
-/home/kirik/Code/Clay/cround/build/_deps/raygui-subbuild/CMakeFiles/rebuild_cache.dir

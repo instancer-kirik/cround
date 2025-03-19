@@ -1,4 +1,5 @@
 This is a bracelet planning software built in C using clay
+This is my 3rd time attempting this project, and my first time using clay
 
 how to build it?
 ```

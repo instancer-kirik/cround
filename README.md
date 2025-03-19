@@ -1,9 +1,11 @@
-bracelet planning software build in c using clay
+This is a bracelet planning software built in C using clay
+
 how to build it?
 ```
 mkdir build && cd build && cmake .. && make
 ```
-takes a lil while, has to fetch and build raylib
+takes a lil while, has to fetch and build raylib and stuff
+it should be able to run anywhere (WIP)
 then 
 ```
 ./bracelet_maker 
